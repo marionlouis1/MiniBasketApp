@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button} from 'react-native';
+import { StyleSheet, Text, View, Button, Image} from 'react-native';
 import {NavigationContainer, useNavigation} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import World from './src/World';
@@ -23,8 +23,13 @@ export default function App() {
     const navigation = useNavigation();
     return (
       <View style={styles.container}>
+        <View style = {{height:'33%', justifyContent:'bottom'}}>
+        <Image style={styles.stretch} source={require("./assets/logoHomeScreen.png")}/>
+        </View>
+      <View style={{height:'66%',justifyContent:'center'}}>
         <Text>Welcome to the moving ball game</Text>
         <Button title="Start Game" onPress={() => navigation.navigate('Game')} />
+      </View>
       </View>
     );
   };
@@ -56,5 +61,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  stretch: {
+    justifyContent: 'center',
+    width: 300,
+    height: 200,
   },
 });

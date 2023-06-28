@@ -55,10 +55,10 @@ export default class App extends Component {
           Matter.Body.setPosition(ball, {
           x: BALL_SIZE/2,
           y: ball.position.y - accelerometerData.y * 10,
-        })} else if (ball.position.y > DEVICE_HEIGHT - BALL_SIZE/2) {
+        })} else if (ball.position.y > DEVICE_HEIGHT - BALL_SIZE) {
           Matter.Body.setPosition(ball, {
           x: ball.position.x + accelerometerData.x * 10,
-          y: DEVICE_HEIGHT - BALL_SIZE/2,
+          y: DEVICE_HEIGHT - 2*BALL_SIZE,
           })}else if (ball.position.y < BALL_SIZE/2 ) {
             Matter.Body.setPosition(ball, {
             x: ball.position.x + accelerometerData.x * 10,
@@ -128,8 +128,12 @@ export default class App extends Component {
               <View style={styles.infoWrapper}>
                 <View style={styles.scoreContainer}>
                   <Text style={styles.scoreText}>Score: {score}</Text>
-                  <Button title="Resume" onPress={() => Accelerometer.setUpdateInterval(15)} />
+                  <Button title="Resume" icon ={{name:"arrow-right",size:15,color:"white"}} onPress={() => Accelerometer.setUpdateInterval(15)} />
                   <Button title="Pause" onPress={() => Accelerometer.setUpdateInterval(100000000)} />
+                  <Button title="Reset Ball" onPress={() => Matter.Body.setPosition(ball, {
+                    x: randomInt(0, DEVICE_WIDTH - BALL_SIZE),
+                    y: randomInt(0, DEVICE_HEIGHT - BALL_SIZE),
+                  })} />
                 </View>
               </View>
             </GameEngine>
@@ -147,7 +151,7 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'gray',
+    backgroundColor: "white" ,
   },
   centered: {
     flex: 1,
@@ -172,5 +176,5 @@ const styles = StyleSheet.create({
   scoreText: {
     fontSize: 25,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#000',
   }})
