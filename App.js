@@ -1,6 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Button, Image } from 'react-native';
+import { StyleSheet, Text, View, Button} from 'react-native';
 import {NavigationContainer, useNavigation} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import World from './src/World';
@@ -9,7 +8,7 @@ import World from './src/World';
 export default function App() {
 
   const BottomTabBar = createBottomTabNavigator();
-  const navigation = useNavigation();
+  
   const TabNavigator = () => {
     return (
       <BottomTabBar.Navigator>
@@ -21,12 +20,11 @@ export default function App() {
   };
   
   const HomeScreen = () => {
+    const navigation = useNavigation();
     return (
       <View style={styles.container}>
         <Text>Welcome to the moving ball game</Text>
-        <NavigationContainer>
-        <Button title="Start G  ame" onPress={() => navigation.navigate('Game')} />
-        </NavigationContainer>
+        <Button title="Start Game" onPress={() => navigation.navigate('Game')} />
       </View>
     );
   };
