@@ -8,3 +8,5 @@ export const DEVICE_WIDTH = width;
 
 
 export const BALL_SIZE = 70;
+
+export const TARGET_SIZE = 70;

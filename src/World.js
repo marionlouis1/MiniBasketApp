@@ -10,9 +10,11 @@ import randomInt from 'random-int';
 import sampleSize from 'lodash.samplesize';
 
 import Ball from "./components/Boule";
-import {BALL_SIZE, DEVICE_HEIGHT, DEVICE_WIDTH} from "./Constants";
+import Cible from "./components/Cible";
+import {BALL_SIZE,TARGET_SIZE, DEVICE_HEIGHT, DEVICE_WIDTH, GRAVITATION_FORCE} from "./Constants";
 
-import { ball } from "./Objects";
+import { ball, cible } from "./Objects";
+
 
 Accelerometer.setUpdateInterval(15)
 
@@ -34,39 +36,45 @@ export default class App extends Component {
   
   constructor(props) {
     super(props);
-    const {engine, world} = this.addObjectsToWorld(ball);
-    this.entities = this.getEntities(engine, world, ball);
+    const {engine, world} = this.addObjectsToWorld(ball, cible);
+    this.entities = this.getEntities(engine, world, ball, cible);
+    
+  
   }
   
   componentDidMount = () => {
     Matter.Body.setPosition(ball, {
       x: randomInt(0, DEVICE_WIDTH - BALL_SIZE),
-      y: randomInt(0, DEVICE_HEIGHT - BALL_SIZE),
+      y: randomInt(0, DEVICE_HEIGHT/2),
+    });
+    Matter.Body.setPosition(cible, {
+      x: DEVICE_WIDTH/2 - TARGET_SIZE,
+      y: 0.7*DEVICE_HEIGHT,
     });
     
     
-    this.Accelerometer = Accelerometer.addListener(accelerometerData => {
+    this.Accelerometer = Accelerometer.addListener(AccelerometerData => {
       if (!this.state.isGamePaused) {
         if (ball.position.x > DEVICE_WIDTH- BALL_SIZE/2) {
           Matter.Body.setPosition(ball, {
           x: DEVICE_WIDTH- BALL_SIZE/2,
-          y: ball.position.y - accelerometerData.y * 10,
+          y: ball.position.y - AccelerometerData.y * 10,
         })} else if (ball.position.x <BALL_SIZE/2) {
           Matter.Body.setPosition(ball, {
           x: BALL_SIZE/2,
-          y: ball.position.y - accelerometerData.y * 10,
+          y: ball.position.y - AccelerometerData.y * 10,
         })} else if (ball.position.y > DEVICE_HEIGHT - BALL_SIZE) {
           Matter.Body.setPosition(ball, {
-          x: ball.position.x + accelerometerData.x * 10,
+          x: ball.position.x + AccelerometerData.x * 10,
           y: DEVICE_HEIGHT - 2*BALL_SIZE,
           })}else if (ball.position.y < BALL_SIZE/2 ) {
             Matter.Body.setPosition(ball, {
-            x: ball.position.x + accelerometerData.x * 10,
+            x: ball.position.x + AccelerometerData.x * 10,
             y: BALL_SIZE/2,
             })} else {
           Matter.Body.setPosition(ball, {
-            x: ball.position.x + accelerometerData.x * 10,
-            y: ball.position.y - accelerometerData.y * 10,
+            x: ball.position.x + AccelerometerData.x * 10,
+            y: ball.position.y - AccelerometerData.y * 10,
             
           });
       }
@@ -76,16 +84,16 @@ export default class App extends Component {
     });
     
     componentWillUnmount =() => {
-      if (this.accelerometer) {
-        this.accelerometer.stop();
+      if (this.Accelerometer) {
+        this.Accelerometer.stop();
       }
     }
   }
-  addObjectsToWorld = ball => {
+  addObjectsToWorld = (ball, cible) => {
     const engine = Matter.Engine.create({enableSleeping: false});
     const world = engine.world;
     
-    let objects = ball;
+    let objects = [ball, cible];
     
     Matter.World.add(world, objects);
     
@@ -95,7 +103,7 @@ export default class App extends Component {
     };
   };
   
-  getEntities = (engine, world, ball) => {
+  getEntities = (engine, world, ball, cible) => {
     const entities = {
           physics: {
             engine,
@@ -109,6 +117,13 @@ export default class App extends Component {
             image: require('../assets/ball.png'),
             renderer: Ball,
           },
+
+          cible: {
+            body: cible,
+            size: [TARGET_SIZE, TARGET_SIZE],
+            image: require('../assets/cible.png'),
+            renderer: Cible,
+          }
         };
       
       
