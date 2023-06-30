@@ -49,7 +49,7 @@ export default class App extends Component {
 
     measureDistanceTargetBall = (ball, cible) => {
       const distance = Math.sqrt(Math.pow(ball.position.x - cible.position.x, 2) + Math.pow(ball.position.y - cible.position.y, 2));
-      if (distance < 500) {
+      if (distance < 50) {
         this.setState({
           score: this.state.score + 1,
         });
@@ -58,7 +58,7 @@ export default class App extends Component {
           y: randomInt(0, DEVICE_HEIGHT/2),
         });
         Matter.Body.setPosition(cible, {
-          x: DEVICE_WIDTH/2 - TARGET_SIZE,
+          x: randomInt(0,DEVICE_WIDTH/2 - TARGET_SIZE),
           y: 0.7*DEVICE_HEIGHT,
         });
       }
@@ -67,21 +67,22 @@ export default class App extends Component {
     this.Accelerometer = Accelerometer.addListener(AccelerometerData => {
       if (!this.state.isGamePaused && ball.position.y < cible.position.y) {
         measureDistanceTargetBall(ball, cible)
+        console.log(this.state.score)
         if (ball.position.x > DEVICE_WIDTH- BALL_SIZE/2) {
           Matter.Body.setPosition(ball, {
             x: DEVICE_WIDTH- BALL_SIZE/2,
-            y: ball.position.y - VITESSES[this.state.score] * 10,
+            y: ball.position.y + VITESSES[this.state.score],
           })
         } else if (ball.position.x <BALL_SIZE/2) {
           Matter.Body.setPosition(ball, {
             x: BALL_SIZE/2,
-            y: ball.position.y - VITESSES[this.state.score] * 10,
+            y: ball.position.y + VITESSES[this.state.score],
 
           })
         } else {
           Matter.Body.setPosition(ball, {
             x: ball.position.x + AccelerometerData.x * 10,
-            y: ball.position.y - VITESSES[this.state.score] * 10,
+            y: ball.position.y + VITESSES[this.state.score] ,
 
           });
         }
