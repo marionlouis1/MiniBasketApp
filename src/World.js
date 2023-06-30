@@ -99,6 +99,10 @@ export default class App extends Component {
 
           });
         }
+      } else if (ball.position.y = cible.position.y) {
+        resetGame();
+        Accelerometer.setUpdateInterval(1500000)
+        console.log("Game Over");
       }
     });
   
@@ -113,9 +117,7 @@ export default class App extends Component {
     }
   };
   
-  addObjectsToWorld = (ball, cible) => {
-    // Le reste de votre code pour la méthode addObjectsToWorld
-  };
+  
    
   addObjectsToWorld = (ball, cible) => {
     const engine = Matter.Engine.create({enableSleeping: false});
