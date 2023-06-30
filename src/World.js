@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, Alert, Button} from 'react-native';
+import {StyleSheet, Text, View, Image, Button} from 'react-native';
 
 import { GameEngine } from "react-native-game-engine";
 import Matter from "matter-js";
@@ -11,18 +11,14 @@ import sampleSize from 'lodash.samplesize';
 
 import Ball from "./components/Boule";
 import Cible from "./components/Cible";
-import {BALL_SIZE,TARGET_SIZE, DEVICE_HEIGHT, DEVICE_WIDTH, GRAVITATION_FORCE} from "./Constants";
+import {BALL_SIZE,TARGET_SIZE, DEVICE_HEIGHT, DEVICE_WIDTH, VITESSES} from "./Constants";
 
 import { ball, cible } from "./Objects";
 
 
 Accelerometer.setUpdateInterval(15)
 
-const _subscribe = () => {
-    setSubscription(
-        Accelerometer.addListener(setData)
-    );
-  };
+
 
 export default class App extends Component {
   
@@ -39,7 +35,6 @@ export default class App extends Component {
     const {engine, world} = this.addObjectsToWorld(ball, cible);
     this.entities = this.getEntities(engine, world, ball, cible);
     
-  
   }
   
   componentDidMount = () => {
@@ -51,44 +46,63 @@ export default class App extends Component {
       x: DEVICE_WIDTH/2 - TARGET_SIZE,
       y: 0.7*DEVICE_HEIGHT,
     });
+
+    measureDistanceTargetBall = (ball, cible) => {
+      const distance = Math.sqrt(Math.pow(ball.position.x - cible.position.x, 2) + Math.pow(ball.position.y - cible.position.y, 2));
+      if (distance < 500) {
+        this.setState({
+          score: this.state.score + 1,
+        });
+        Matter.Body.setPosition(ball, {
+          x: randomInt(0, DEVICE_WIDTH - BALL_SIZE),
+          y: randomInt(0, DEVICE_HEIGHT/2),
+        });
+        Matter.Body.setPosition(cible, {
+          x: DEVICE_WIDTH/2 - TARGET_SIZE,
+          y: 0.7*DEVICE_HEIGHT,
+        });
+      }
     
-    
+    }
     this.Accelerometer = Accelerometer.addListener(AccelerometerData => {
-      if (!this.state.isGamePaused) {
+      if (!this.state.isGamePaused && ball.position.y < cible.position.y) {
+        measureDistanceTargetBall(ball, cible)
         if (ball.position.x > DEVICE_WIDTH- BALL_SIZE/2) {
           Matter.Body.setPosition(ball, {
-          x: DEVICE_WIDTH- BALL_SIZE/2,
-          y: ball.position.y - AccelerometerData.y * 10,
-        })} else if (ball.position.x <BALL_SIZE/2) {
+            x: DEVICE_WIDTH- BALL_SIZE/2,
+            y: ball.position.y - VITESSES[this.state.score] * 10,
+          })
+        } else if (ball.position.x <BALL_SIZE/2) {
           Matter.Body.setPosition(ball, {
-          x: BALL_SIZE/2,
-          y: ball.position.y - AccelerometerData.y * 10,
-        })} else if (ball.position.y > DEVICE_HEIGHT - BALL_SIZE) {
-          Matter.Body.setPosition(ball, {
-          x: ball.position.x + AccelerometerData.x * 10,
-          y: DEVICE_HEIGHT - 2*BALL_SIZE,
-          })}else if (ball.position.y < BALL_SIZE/2 ) {
-            Matter.Body.setPosition(ball, {
-            x: ball.position.x + AccelerometerData.x * 10,
-            y: BALL_SIZE/2,
-            })} else {
+            x: BALL_SIZE/2,
+            y: ball.position.y - VITESSES[this.state.score] * 10,
+
+          })
+        } else {
           Matter.Body.setPosition(ball, {
             x: ball.position.x + AccelerometerData.x * 10,
-            y: ball.position.y - AccelerometerData.y * 10,
-            
+            y: ball.position.y - VITESSES[this.state.score] * 10,
+
           });
+        }
       }
-  }})
+    });
+  
     this.setState({
       isGameSetup: true,
     });
-    
-    componentWillUnmount =() => {
-      if (this.Accelerometer) {
-        this.Accelerometer.stop();
-      }
+  };
+  
+  componentWillUnmount = () => {
+    if (this.Accelerometer) {
+      this.Accelerometer.remove();
     }
-  }
+  };
+  
+  addObjectsToWorld = (ball, cible) => {
+    // Le reste de votre code pour la méthode addObjectsToWorld
+  };
+   
   addObjectsToWorld = (ball, cible) => {
     const engine = Matter.Engine.create({enableSleeping: false});
     const world = engine.world;
@@ -102,6 +116,7 @@ export default class App extends Component {
       world,
     };
   };
+  
   
   getEntities = (engine, world, ball, cible) => {
     const entities = {
@@ -147,7 +162,7 @@ export default class App extends Component {
                   <Button title="Pause" onPress={() => Accelerometer.setUpdateInterval(100000000)} />
                   <Button title="Reset Ball" onPress={() => Matter.Body.setPosition(ball, {
                     x: randomInt(0, DEVICE_WIDTH - BALL_SIZE),
-                    y: randomInt(0, DEVICE_HEIGHT - BALL_SIZE),
+                    y: randomInt(0, cible.position.y),
                   })} />
                 </View>
               </View>
