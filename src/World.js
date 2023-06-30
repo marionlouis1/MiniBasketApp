@@ -63,11 +63,24 @@ export default class App extends Component {
         });
       }
     
+      resetGame = () => {
+        this.setState({
+          score: 0,
+        });
+        Matter.Body.setPosition(ball, {
+          x: randomInt(0, DEVICE_WIDTH - BALL_SIZE),
+          y: randomInt(0, DEVICE_HEIGHT/2),
+        });
+        Matter.Body.setPosition(cible, {
+          x: randomInt(0,DEVICE_WIDTH/2 - TARGET_SIZE),
+          y: 0.7*DEVICE_HEIGHT,
+        });
+      }
+
     }
     this.Accelerometer = Accelerometer.addListener(AccelerometerData => {
       if (!this.state.isGamePaused && ball.position.y < cible.position.y) {
         measureDistanceTargetBall(ball, cible)
-        console.log(this.state.score)
         if (ball.position.x > DEVICE_WIDTH- BALL_SIZE/2) {
           Matter.Body.setPosition(ball, {
             x: DEVICE_WIDTH- BALL_SIZE/2,
@@ -161,10 +174,7 @@ export default class App extends Component {
                   <Text style={styles.scoreText}>Score: {score}</Text>
                   <Button title="Resume" icon ={{name:"arrow-right",size:15,color:"white"}} onPress={() => Accelerometer.setUpdateInterval(15)} />
                   <Button title="Pause" onPress={() => Accelerometer.setUpdateInterval(100000000)} />
-                  <Button title="Reset Ball" onPress={() => Matter.Body.setPosition(ball, {
-                    x: randomInt(0, DEVICE_WIDTH - BALL_SIZE),
-                    y: randomInt(0, cible.position.y),
-                  })} />
+                  <Button title="Restart" onPress={() => resetGame()} />
                 </View>
               </View>
             </GameEngine>
